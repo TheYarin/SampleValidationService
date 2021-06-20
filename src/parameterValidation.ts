@@ -22,59 +22,54 @@ export function validateParameters(
   return validationErrors;
 }
 
-function* getMissingRequiredParameterErrors(
+function getMissingRequiredParameterErrors(
   paramsModel: ParamModel[],
   namesOfParamsInRequest: string[],
   paramSectionName: string
-): IterableIterator<ValidationError> {
+): ValidationError[] {
   const namesOfRequiredParams = paramsModel.filter((paramModel) => paramModel.required).map((paramModel) => paramModel.name);
 
   const namesOfMissingParams = namesOfRequiredParams.filter(
     (requiredParamName) => !namesOfParamsInRequest.includes(requiredParamName)
   );
 
-  for (const nameOfMissingParam of namesOfMissingParams) {
-    yield {
-      field: `${paramSectionName}.${nameOfMissingParam}`,
-      abnormality: "Field marked as required but is missing.",
-    };
-  }
+  return namesOfMissingParams.map((nameOfMissingParam) => ({
+    field: `${paramSectionName}.${nameOfMissingParam}`,
+    abnormality: "Field marked as required but is missing.",
+  }));
 }
 
-function* getExtraParameterErrors(
+function getExtraParameterErrors(
   namesOfParamsInRequest: string[],
   namesOfParamsInModel: string[],
   paramSectionName: string
-): IterableIterator<ValidationError> {
+): ValidationError[] {
   const namesOfExtraParams = namesOfParamsInRequest.filter((requestParam) => !namesOfParamsInModel.includes(requestParam));
 
-  for (const nameOfExtraParam of namesOfExtraParams) {
-    yield {
-      field: `${paramSectionName}.${nameOfExtraParam}`,
-      abnormality: "Extra param, does not appear in the model.",
-    };
-  }
+  return namesOfExtraParams.map((nameOfExtraParam) => ({
+    field: `${paramSectionName}.${nameOfExtraParam}`,
+    abnormality: "Extra param, does not appear in the model.",
+  }));
 }
 
-function* getParameterTypeErrors(
+function getParameterTypeErrors(
   paramsModel: ParamModel[],
   namesOfParamsInModel: string[],
   namesOfParamsInRequest: string[],
   paramsInRequest: Param[],
   paramSectionName: string
-): IterableIterator<ValidationError> {
+): ValidationError[] {
   const paramNameToModel = new Map(paramsModel.map((paramModel) => [paramModel.name, paramModel]));
   const namesOfParamsinBothModelAndRequest = namesOfParamsInModel.filter((item) => namesOfParamsInRequest.includes(item));
   const paramsThatCanBeValidated = paramsInRequest.filter((param) => namesOfParamsinBothModelAndRequest.includes(param.name));
 
-  for (const requestParam of paramsThatCanBeValidated) {
+  const paramsWithInvalidType = paramsThatCanBeValidated.filter((requestParam) => {
     const paramModel = paramNameToModel.get(requestParam.name)!;
+    return paramModel.types.every((type) => !validate[type](requestParam.value));
+  });
 
-    if (paramModel.types.every((type) => !validate[type](requestParam.value))) {
-      yield {
-        field: `${paramSectionName}.${requestParam.name}`,
-        abnormality: "value does not match the model's type",
-      };
-    }
-  }
+  return paramsWithInvalidType.map((requestParamWithInvalidType) => ({
+    field: `${paramSectionName}.${requestParamWithInvalidType.name}`,
+    abnormality: "value does not match the model's type",
+  }));
 }
