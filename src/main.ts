@@ -15,7 +15,7 @@ app.post("/submitModels", (req, res) => {
 });
 
 app.post("/validateRequest", (req, res) => {
-  // TODO gracefully handle any error that might be thrown in this function
+  // Exceptions thrown here will automatically return a 50X status code, and the call stack if not in production. I'm fine with that.
 
   const requestToValidate: RequestToValidate = req.body; // Assuming the general structure of the request is valid because the request was already parsed by another internal server. Should be validated using a tool like https://github.com/woutervh-/typescript-is
   const [isValid, validationErrors] = service.validateRequest(requestToValidate);
