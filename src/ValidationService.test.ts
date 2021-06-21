@@ -545,7 +545,7 @@ test("example request #12", () => {
     ],
   };
 
-  const [isValid, validationErrors] = validationService.validateRequest(request);
+  const [isValid, _validationErrors] = validationService.validateRequest(request);
 
   expect(isValid).toBe(true);
 });
