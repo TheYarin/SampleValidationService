@@ -1,7 +1,7 @@
 //#region Model types
 
 export const SUPPORTED_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
-type ParamType = "Int" | "String" | "Boolean" | "Date" | "Email" | "UUID" | "Auth-Token";
+export type ParamType = "Int" | "String" | "Boolean" | "Date" | "Email" | "UUID" | "Auth-Token" | "List";
 
 export type ParamModel = {
   name: string;

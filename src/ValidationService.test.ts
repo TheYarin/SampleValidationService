@@ -117,8 +117,7 @@ validationService.loadModels([
       },
       {
         name: "items",
-        // types: ["List"],
-        types: ["String"],
+        types: ["List"],
         required: true,
       },
     ],
@@ -548,10 +547,7 @@ test("example request #12", () => {
 
   const [isValid, validationErrors] = validationService.validateRequest(request);
 
-  expect(isValid).toBe(false);
-  expect(validationErrors.length).toBe(1);
-  expect(validationErrors[0].field).toBe("query_params.order_id");
-  expect(validationErrors[0].abnormality).toContain("does not match the model's type");
+  expect(isValid).toBe(true);
 });
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

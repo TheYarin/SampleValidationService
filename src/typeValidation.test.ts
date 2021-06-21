@@ -60,3 +60,38 @@ test("Email validation sanity", () => {
   expect(validate["Email"](undefined)).toBe(false);
   expect(validate["Email"](5)).toBe(false);
 });
+
+test("List validation sanity", () => {
+  expect(
+    validate["List"]([
+      {
+        id: "a1",
+        amount: 3,
+      },
+    ])
+  ).toBe(true);
+  expect(validate["List"]([])).toBe(true);
+  expect(
+    validate["List"]([
+      {
+        id: "a1",
+        amount: 3,
+        extra: true,
+      },
+    ])
+  ).toBe(false);
+  expect(validate["List"]([{}])).toBe(false);
+  expect(validate["List"]([{ id: 1, amount: "hello" }])).toBe(false);
+  expect(
+    validate["List"]([
+      {
+        id: "a1",
+        amount: 3,
+      },
+      { id: 1, amount: "hello" },
+    ])
+  ).toBe(false);
+  expect(validate["List"](null)).toBe(false);
+  expect(validate["List"](undefined)).toBe(false);
+  expect(validate["List"](5)).toBe(false);
+});

@@ -1,7 +1,8 @@
 import moment from "moment";
+import { ParamType } from "./Entities";
 
 interface ITypeValidator {
-  type: string;
+  type: ParamType;
   isOfType: (value: any) => boolean;
 }
 
@@ -29,6 +30,29 @@ const authTokenValidator: ITypeValidator = {
   isOfType: (value) => stringValidator.isOfType(value) && /^Bearer [a-zA-Z\d-]+$/.test(value),
 };
 
+const listValidator: ITypeValidator = {
+  type: "List",
+  isOfType: (value) => {
+    // If the structure gets any more complex than that, consider using a schema validation package.
+    if (!Array.isArray(value)) return false;
+
+    for (const item of value) {
+      if (typeof item !== "object") return false;
+
+      const itemKeys = Object.keys(item);
+      if (itemKeys.length !== 2) return false;
+      if (!itemKeys.includes("id")) return false;
+      if (!itemKeys.includes("amount")) return false;
+      if (!stringValidator.isOfType(item["id"])) return false;
+      if (typeof item["amount"] !== "number") return false;
+    }
+
+    // TODO consider enforcing a unique ID within the list
+
+    return true;
+  },
+};
+
 const typeValidators = [
   intValidator,
   stringValidator,
@@ -37,6 +61,7 @@ const typeValidators = [
   emailValidator,
   uuidValidator,
   authTokenValidator,
+  listValidator,
 ];
 
 const validate: { [type: string]: (value: any) => boolean } = {};
