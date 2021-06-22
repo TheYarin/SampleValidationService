@@ -94,4 +94,33 @@ test("List validation sanity", () => {
   expect(validate["List"](null)).toBe(false);
   expect(validate["List"](undefined)).toBe(false);
   expect(validate["List"](5)).toBe(false);
+  expect(validate["List"]("hey")).toBe(false);
+  expect(
+    validate["List"]([
+      {
+        id: "a1",
+        amount: 3,
+      },
+      "surprise",
+    ])
+  ).toBe(false);
+  expect(
+    validate["List"]([
+      {
+        id: "a1",
+        amount: 3,
+      },
+      [],
+    ])
+  ).toBe(false);
+  expect(
+    validate["List"]([
+      {
+        id: "a1",
+        amount: 3,
+      },
+      undefined,
+    ])
+  ).toBe(false);
+  expect(validate["List"]([])).toBe(true);
 });
